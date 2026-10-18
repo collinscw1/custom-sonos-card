@@ -651,22 +651,26 @@ class PlayerHeader extends LitElement {
           display: none;
         }
 
+        /* Still shorter than the 1.85rem CTA pill beside it, so the row (and the 188px height budget) doesn't grow. */
         .switcher-button {
-          gap: 0.35rem;
+          gap: 0.45rem;
         }
 
+        /* Same size as the text, so the glyph's ink spans roughly the capital height. A bigger icon hangs below
+           the baseline and reads as off-centre even though flex centres it exactly. */
         .speaker-icon {
-          --mdc-icon-size: calc(var(--sonos-font-size, 1rem) * 1.07);
+          --mdc-icon-size: calc(var(--sonos-font-size, 1rem) * 1.1);
         }
 
         .switcher-name {
-          font-size: var(--sonos-font-size, 1rem);
+          font-size: calc(var(--sonos-font-size, 1rem) * 1.1);
+          line-height: 1.2;
           color: var(--secondary-text-color);
-          gap: 0.3rem;
+          gap: 0.35rem;
         }
 
         .chevron {
-          --mdc-icon-size: 0.85rem;
+          --mdc-icon-size: 0.95rem;
         }
 
         .cta-pill {
