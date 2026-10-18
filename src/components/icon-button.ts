@@ -31,7 +31,7 @@ class IconButton extends LitElement {
       }
       button {
         cursor: pointer;
-        background: none;
+        background: var(--icon-button-background, none);
         border: none;
         padding: 0;
         margin: 0;

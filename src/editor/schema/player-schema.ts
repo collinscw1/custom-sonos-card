@@ -48,6 +48,21 @@ export const PLAYER_SCHEMA = [
     help: 'Margin around player controls (e.g., 0 3rem)',
   },
   {
+    name: 'ctaButtonColor',
+    type: 'string',
+    help: 'Color for the optional call-to-action button (e.g., #1DB954). Defaults to Spotify green',
+  },
+  {
+    name: 'ctaButtonLabel',
+    type: 'string',
+    help: 'Label for the optional call-to-action button (e.g., "Open Spotify"). Only shown when ctaButtonNavigationPath is also set',
+  },
+  {
+    name: 'ctaButtonNavigationPath',
+    type: 'string',
+    help: 'Dashboard navigation path the call-to-action button navigates to (e.g., "#spotify-browser"). Button is hidden if not set',
+  },
+  {
     name: 'fallbackArtwork',
     type: 'string',
     help: 'Override default fallback artwork image if artwork is missing for the currently selected media',
@@ -157,6 +172,11 @@ export const PLAYER_SCHEMA = [
   {
     name: 'stopInsteadOfPause',
     selector: { boolean: {} },
+  },
+  {
+    name: 'switcherGrouping',
+    selector: { boolean: {} },
+    help: 'Group/ungroup buttons in the speaker dropdown. On unless set to false',
   },
   {
     name: 'volumeEntityId',

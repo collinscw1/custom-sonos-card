@@ -8,6 +8,7 @@ export const CALL_MEDIA_STARTED = `${dispatchPrefix}call-media-started`;
 export const CALL_MEDIA_DONE = `${dispatchPrefix}call-media-done`;
 export const MEDIA_ITEM_SELECTED = 'item-selected';
 export const SESSION_STORAGE_PLAYER_ID = 'sonos-card-player-id';
+export const CTA_HANDOFF_EVENT = 'sonos-card-handoff';
 export const HASS_MORE_INFO = 'hass-more-info';
 
 export const TV_BASE64_IMAGE =

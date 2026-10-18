@@ -1,7 +1,8 @@
 import { HassEntity } from 'home-assistant-js-websocket';
 import { CardConfig, HomeAssistantWithEntities, PredefinedGroup, Section } from '../types';
 import { MediaPlayerEntityFeature } from '../upstream/data/media-player';
-import { ACTIVE_PLAYER_EVENT, ACTIVE_PLAYER_EVENT_INTERNAL } from '../constants';
+import { navigate } from 'custom-card-helpers';
+import { ACTIVE_PLAYER_EVENT, ACTIVE_PLAYER_EVENT_INTERNAL, CTA_HANDOFF_EVENT } from '../constants';
 import { MediaPlayer } from '../model/media-player';
 import { GroupingItem } from '../model/grouping-item';
 
@@ -20,6 +21,10 @@ export function getSpeakerList(mainPlayer: MediaPlayer, predefinedGroups: Predef
     }
   }
   const otherMembers = mainPlayer.members.filter((member) => member.id !== mainPlayer.id);
+  if (otherMembers.length > 1) {
+    // "Living Room + 2" rather than every name, which no header can fit
+    return `${mainPlayer.name} + ${otherMembers.length}`;
+  }
   return [mainPlayer.name, ...otherMembers.map((member) => member.name)].join(' + ');
 }
 
@@ -29,6 +34,13 @@ export function dispatchActivePlayerId(playerId: string, config: CardConfig, ele
   } else {
     element.dispatchEvent(customEvent(ACTIVE_PLAYER_EVENT_INTERNAL, { entityId: playerId }));
   }
+}
+
+// Announces the selected speaker/group before navigating, so whatever the CTA opens (e.g. the Spotify browser) can
+// play to it. Fired first because navigate() opens the target synchronously.
+export function openCta(element: HTMLElement, player: MediaPlayer, path: string) {
+  dispatch(CTA_HANDOFF_EVENT, { entityId: player.id, members: player.members.map((member) => member.id) });
+  navigate(element, path);
 }
 
 export function cardDoesNotContainAllSections(config: CardConfig) {

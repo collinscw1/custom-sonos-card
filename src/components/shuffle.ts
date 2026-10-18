@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import MediaControlService from '../services/media-control-service';
 import Store from '../model/store';
@@ -15,13 +15,27 @@ class Shuffle extends LitElement {
     this.activePlayer = this.store.activePlayer;
     this.mediaControlService = this.store.mediaControlService;
 
-    return html`<sonos-icon-button @click=${this.shuffle} .path=${this.shuffleIcon()}></sonos-icon-button> `;
+    return html`<sonos-icon-button
+      @click=${this.shuffle}
+      .path=${this.shuffleIcon()}
+      ?selected=${!!this.activePlayer?.attributes.shuffle}
+    ></sonos-icon-button> `;
   }
 
   private shuffle = async () => await this.mediaControlService.shuffle(this.activePlayer);
 
   private shuffleIcon() {
     return this.activePlayer?.attributes.shuffle ? mdiShuffle : mdiShuffleDisabled;
+  }
+
+  static get styles() {
+    return css`
+      sonos-icon-button[selected] {
+        color: var(--accent-color);
+        background: rgba(var(--rgb-accent-color), 0.15);
+        border-radius: 50%;
+      }
+    `;
   }
 }
 

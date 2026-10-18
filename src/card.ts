@@ -38,18 +38,19 @@ export class Card extends LitElement {
     const contentHeight = showFooter ? height - footerHeight : height;
     const title = this.config.title;
     height = title ? height + TITLE_HEIGHT : height;
+    const autoHeight = this.section === PLAYER && !showFooter;
     const noPlayersText = isSonosCard(this.config)
       ? 'No supported players found'
       : "No players found. Make sure you have configured entities in the card's configuration, or configured `entityPlatform`.";
     return html`
-      <ha-card style=${this.haCardStyle(height)}>
+      <ha-card style=${this.haCardStyle(height, autoHeight)}>
         <div class="loader" ?hidden=${!this.showLoader}>
           <ha-circular-progress indeterminate></ha-circular-progress></div
         >
         </div>
         ${title ? html`<div class="title">${title}</div>` : html``}
         ${this.configError ? html`<div class="no-players">${this.configError}</div>` : html``}
-        <div class="content" style=${this.contentStyle(contentHeight)}>
+        <div class="content" style=${this.contentStyle(contentHeight, autoHeight)}>
           ${
             this.activePlayerId
               ? choose(this.section, [
@@ -88,6 +89,16 @@ export class Card extends LitElement {
   }
   getCardSize() {
     return 3;
+  }
+
+  // tells HA's Sections dashboard view how this card can be resized in its grid; ignored by the older Masonry view
+  getLayoutOptions() {
+    const sections = this.config?.sections;
+    const showFooter = !sections || sections.length > 1;
+    const playerOnly = this.section === PLAYER && !showFooter;
+    return playerOnly
+      ? { grid_columns: 4, grid_rows: 6, grid_min_columns: 3, grid_min_rows: 4 }
+      : { grid_columns: 4, grid_rows: 8, grid_min_columns: 3, grid_min_rows: 4 };
   }
 
   static getConfigElement() {
@@ -167,15 +178,22 @@ export class Card extends LitElement {
     }
   };
 
-  haCardStyle(height: number) {
+  haCardStyle(height: number, autoHeight = false) {
     const width = getWidth(this.config);
     const minWidth = this.config.minWidth ?? 20;
     return styleMap({
       color: 'var(--secondary-text-color)',
-      height: `${height}rem`,
+      // 100% fills whatever height a Sections-view grid cell assigns (enabling drag-resize); with no externally
+      // imposed height (Masonry view, or Sections before a resize), this collapses back to the content's own size
+      height: autoHeight ? '100%' : `${height}rem`,
       minWidth: `${minWidth}rem`,
       maxWidth: `${width}rem`,
       overflow: 'hidden',
+      // when the player card renders its own rounded/shadowed card chrome (autoHeight), ha-card's default
+      // chrome would otherwise double up and its border-radius wouldn't match, leaking through at the corners.
+      // width/minWidth/maxWidth are also overridden here so the card fills a resized Sections grid cell instead
+      // of capping at the generic widthPercentage default; the inner .card's own max-width still bounds it visually
+      ...(autoHeight ? { background: 'transparent', boxShadow: 'none', borderRadius: '2rem', width: '100%', minWidth: '0', maxWidth: 'none' } : {}),
       // only set borderRadius if this.config.style.borderRadius is set, otherwise the card looks weird with box-shadow
       ...(this.config.style?.borderRadius ? { borderRadius: this.config.style.borderRadius } : {}),
       ...(this.config.baseFontSize
@@ -207,10 +225,10 @@ export class Card extends LitElement {
     });
   }
 
-  private contentStyle(height: number) {
+  private contentStyle(height: number, autoHeight = false) {
     return styleMap({
       overflowY: 'auto',
-      height: `${height}rem`,
+      height: autoHeight ? '100%' : `${height}rem`,
     });
   }
 

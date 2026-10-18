@@ -27,8 +27,5 @@
     "./src/**/*",
     "./test/**/*",
     "./scripts/deploy.ts"
-  ],
-  "exclude": [
-    "./src/upstream/**/*"
   ]
 }

@@ -302,6 +302,7 @@ player:
   showSource: true # default is false. Will show the source (if available) in the player section.
   showVolumeUpAndDownButtons: true # default is false, shows buttons for increasing and decreasing volume
   stopInsteadOfPause: true # default is false. Will show the stop button instead of the pause button when media is playing.
+  switcherGrouping: false # default is true. Shows add/remove buttons and Group all / Ungroup all in the speaker dropdown. Set to false for a plain speaker switcher.
 ```
 
 ### Media Browser Configuration

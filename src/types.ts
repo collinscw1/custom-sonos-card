@@ -65,6 +65,9 @@ export interface PlayerConfig {
   controlsColor?: string;
   controlsLargeIcons?: boolean;
   controlsMargin?: string;
+  ctaButtonColor?: string;
+  ctaButtonLabel?: string;
+  ctaButtonNavigationPath?: string;
   fallbackArtwork?: string;
   fastForwardAndRewindStepSizeSeconds?: number;
   headerEntityFontSize?: number;
@@ -92,6 +95,7 @@ export interface PlayerConfig {
   showSource?: boolean;
   showVolumeUpAndDownButtons?: boolean;
   stopInsteadOfPause?: boolean;
+  switcherGrouping?: boolean;
   volumeEntityId?: string;
   volumeMuteButtonSize?: number;
   volumeSliderHeight?: number;

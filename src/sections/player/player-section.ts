@@ -37,18 +37,16 @@ export class Player extends LitElement {
         : `${getBackgroundImage(this.store, this.imageLoaded, this.resolvedImageUrl)}; ${opacityStyle}`
       : '';
     const hideArtwork = (artworkAsBackground && !blurAmount) || !!hideArtworkConfig;
-    const controlsMarginStyle = controlsMargin ? `margin: ${controlsMargin}` : '';
+    const infoStyle = controlsMargin ? `margin: ${controlsMargin}` : '';
     return html`
-      <div class="container ${blurAmount > 0 ? 'blurred-background' : ''}" style=${containerStyle || nothing}>
-        <sonos-player-header class="header" background=${artworkAsBackground || nothing} .store=${this.store} ?hidden=${!!hideHeader}></sonos-player-header>
-        <div class="artwork" ?hidden=${hideArtwork} style=${getArtworkStyle(this.store, this.imageLoaded, this.resolvedImageUrl)}></div>
-        <sonos-player-controls
-          class="controls"
-          background=${artworkAsBackground || nothing}
-          .store=${this.store}
-          ?hidden=${!!hideControls}
-          style=${controlsMarginStyle || nothing}
-        ></sonos-player-controls>
+      <div class="container">
+        <div class="card ${blurAmount > 0 ? 'blurred-background' : ''}" background=${artworkAsBackground || nothing} style=${containerStyle || nothing}>
+          <div class="artwork" ?hidden=${hideArtwork} style=${getArtworkStyle(this.store, this.imageLoaded, this.resolvedImageUrl)}></div>
+          <div class="info" style=${infoStyle || nothing}>
+            <sonos-player-header .store=${this.store} ?hidden=${!!hideHeader}></sonos-player-header>
+            <sonos-player-controls .store=${this.store} ?hidden=${!!hideControls}></sonos-player-controls>
+          </div>
+        </div>
       </div>
     `;
   }

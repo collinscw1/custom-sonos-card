@@ -8,10 +8,11 @@ import {
   getHeight,
   getSpeakerList,
   getWidth,
+  openCta,
 } from '../../src/utils/utils';
 import { HassEntity } from 'home-assistant-js-websocket';
 import { CardConfig, HomeAssistantWithEntities, PredefinedGroup, Section } from '../../src/types';
-import { ACTIVE_PLAYER_EVENT, ACTIVE_PLAYER_EVENT_INTERNAL } from '../../src/constants';
+import { ACTIVE_PLAYER_EVENT, ACTIVE_PLAYER_EVENT_INTERNAL, CTA_HANDOFF_EVENT } from '../../src/constants';
 import { GroupingItem } from '../../src/model/grouping-item';
 import { MediaPlayer } from '../../src/model/media-player';
 
@@ -67,6 +68,15 @@ describe('Utils', () => {
       // Assert
       expect(speakerList).toBe(`${entityOne.attributes.friendly_name} + ${entityTwo.attributes.friendly_name}`);
     });
+    it('group of three or more shows a count', () => {
+      // Arrange
+      entityOne.attributes.group_members = [entityOne.entity_id, entityTwo.entity_id, entityThree.entity_id];
+      const mainPlayer: MediaPlayer = new MediaPlayer(entityOne, config, entities);
+      // Act
+      const speakerList = getSpeakerList(mainPlayer);
+      // Assert
+      expect(speakerList).toBe(`${entityOne.attributes.friendly_name} + 2`);
+    });
     it('single', () => {
       // Arrange
       entityOne.attributes.group_members = [entityOne.entity_id];
@@ -114,6 +124,25 @@ describe('Utils', () => {
       const customEvent = elemDispatchEvent.mock.calls[0][0] as CustomEvent;
       expect(customEvent.type).toBe(ACTIVE_PLAYER_EVENT_INTERNAL);
       expect(customEvent.detail.entityId).toBe(entityOne.entity_id);
+    });
+  });
+  describe('openCta', () => {
+    it('announces the selected group before navigating', () => {
+      // Arrange
+      entityOne.attributes.group_members = groupMembers;
+      const mainPlayer: MediaPlayer = new MediaPlayer(entityOne, config, entities);
+      const spy = vi.spyOn(window, 'dispatchEvent');
+      spy.mockClear();
+
+      // Act
+      openCta(element as HTMLElement, mainPlayer, '#spotify-browser');
+
+      // Assert
+      const [handoff, navigation] = spy.mock.calls.map(([event]) => event as CustomEvent);
+      expect(handoff.type).toBe(CTA_HANDOFF_EVENT);
+      expect(handoff.detail).toEqual({ entityId: entityOne.entity_id, members: groupMembers });
+      expect(navigation.type).toBe('location-changed');
+      expect(window.location.hash).toBe('#spotify-browser');
     });
   });
   describe('getHeight', () => {

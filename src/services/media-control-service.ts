@@ -15,17 +15,23 @@ export default class MediaControlService {
     return mediaPlayer.attributes.platform === 'music_assistant';
   }
 
-  async join(main: string, memberIds: string[]) {
-    await this.hassService.callMediaService('join', {
-      entity_id: main,
-      group_members: memberIds,
-    });
+  // showLoader=false skips the card-wide loader, for callers that show their own per-item progress
+  async join(main: string, memberIds: string[], showLoader = true) {
+    const data = { entity_id: main, group_members: memberIds };
+    if (showLoader) {
+      await this.hassService.callMediaService('join', data);
+    } else {
+      await this.hassService.callService('media_player', 'join', data);
+    }
   }
 
-  async unJoin(playerIds: string[]) {
-    await this.hassService.callMediaService('unjoin', {
-      entity_id: playerIds,
-    });
+  async unJoin(playerIds: string[], showLoader = true) {
+    const data = { entity_id: playerIds };
+    if (showLoader) {
+      await this.hassService.callMediaService('unjoin', data);
+    } else {
+      await this.hassService.callService('media_player', 'unjoin', data);
+    }
   }
 
   async activatePredefinedGroup(pg: PredefinedGroup) {
@@ -75,6 +81,16 @@ export default class MediaControlService {
 
   async play(mediaPlayer: MediaPlayer) {
     await this.hassService.callMediaService('media_play', { entity_id: mediaPlayer.id });
+  }
+
+  async togglePlayPause(mediaPlayer: MediaPlayer) {
+    if (!mediaPlayer.isPlaying()) {
+      await this.play(mediaPlayer);
+    } else if (this.config.player?.stopInsteadOfPause) {
+      await this.stop(mediaPlayer);
+    } else {
+      await this.pause(mediaPlayer);
+    }
   }
 
   async shuffle(mediaPlayer: MediaPlayer) {

@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body{margin:0;background:oklch(96% 0.004 90);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;}
+    a{color:inherit;text-decoration:none;}
+    a:hover{opacity:0.85;}
+    @keyframes eqBounce{0%,100%{transform:scaleY(0.35);}50%{transform:scaleY(1);}}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+  <script src="./image-slot.js"></script>
+</helmet>
+
+<sc-if value="{{isHorizontal}}" hint-placeholder-val="{{false}}">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px 24px;box-sizing:border-box;">
+<div style="position:relative;width:384px;height:188px;container-type:size;background:oklch(99% 0.002 90);border-radius:20px;box-shadow:0 10px 30px -12px rgba(0,0,0,0.18),0 1px 4px rgba(0,0,0,0.04);display:flex;flex-direction:row;gap:12px;padding:12px;box-sizing:border-box;">
+
+  <div style="width:min(36cqw, 100cqh);aspect-ratio:1/1;height:auto;flex-shrink:0;align-self:center;border-radius:14px;overflow:hidden;background:oklch(93% 0.005 90);">
+    <image-slot id="art-{{activeSpeaker.id}}" shape="rounded" radius="14" fit="contain" placeholder="album art"></image-slot>
+  </div>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <button onClick="{{toggleSwitcher}}" style="min-width:0;display:flex;align-items:center;gap:4px;background:none;border:none;padding:0;cursor:pointer;text-align:left;color:oklch(45% 0.01 90);font-size:12px;font-weight:600;">
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{groupName}}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;opacity:0.6;"><polyline points="6,9 12,15 18,9"></polyline></svg>
+      </button>
+      <sc-if value="{{showSpotifyCta}}" hint-placeholder-val="{{true}}">
+        <a href="https://open.spotify.com" target="_blank" rel="noopener" title="Open Spotify" style="flex-shrink:0;display:flex;align-items:center;gap:4px;height:26px;padding:0 10px;border-radius:13px;background:{{ctaBg}};color:{{ctaColor}};font-size:11px;font-weight:700;">
+          Spotify
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"></path><path d="M19 5l-8.5 8.5"></path><path d="M18 14v5H5V6h5"></path></svg>
+        </a>
+      </sc-if>
+      <sc-if value="{{switcherOpen}}" hint-placeholder-val="{{false}}">
+        <div onClick="{{toggleSwitcher}}" style="position:fixed;inset:0;z-index:15;"></div>
+        <div style="position:absolute;top:46px;left:12px;right:12px;background:#fff;border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,0.16);padding:8px;z-index:20;box-sizing:border-box;">
+          <sc-for list="{{speakerList}}" as="sp" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;align-items:center;gap:2px;">
+                <div onClick="{{sp.select}}" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;cursor:pointer;" style-hover="background:oklch(96% 0.004 90);">
+                  <div style="width:14px;height:12px;flex-shrink:0;display:flex;align-items:flex-end;gap:2px;">
+                    <sc-if value="{{sp.playing}}" hint-placeholder-val="{{false}}">
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;"></div>
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.2s;"></div>
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.4s;"></div>
+                    </sc-if>
+                  </div>
+                  <div style="min-width:0;flex:1;">
+                    <div style="font-size:13px;font-weight:{{sp.nameWeight}};color:oklch(20% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{sp.name}}</div>
+                    <div style="font-size:11px;color:oklch(52% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{sp.subtitle}}</div>
+                  </div>
+                </div>
+                <sc-if value="{{showGroupControls}}" hint-placeholder-val="{{true}}">
+                  <div style="width:80px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                    <sc-if value="{{sp.ctlGroupAll}}" hint-placeholder-val="{{false}}">
+                      <button onClick="{{groupAll}}" style="height:28px;padding:0 12px;border-radius:14px;background:oklch(94% 0.004 90);border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:oklch(20% 0.01 90);opacity:{{groupAllOpacity}};white-space:nowrap;flex-shrink:0;" style-hover="background:oklch(91% 0.004 90);">{{groupAllLabel}}</button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlOn}}" hint-placeholder-val="{{false}}">
+                      <button onClick="{{sp.toggleGroup}}" title="Remove from group" style="width:44px;height:44px;border-radius:50%;background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:oklch(96% 0.004 90);">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="oklch(20% 0.01 90)"></circle><polyline points="7.5,12.5 10.5,15.5 16.5,9" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlOff}}" hint-placeholder-val="{{true}}">
+                      <button onClick="{{sp.toggleGroup}}" title="Add to group" style="width:44px;height:44px;border-radius:50%;background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:oklch(96% 0.004 90);">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="oklch(72% 0.005 90)" stroke-width="2"></circle><line x1="12" y1="8" x2="12" y2="16" stroke="oklch(30% 0.01 90)" stroke-width="2" stroke-linecap="round"></line><line x1="8" y1="12" x2="16" y2="12" stroke="oklch(30% 0.01 90)" stroke-width="2" stroke-linecap="round"></line></svg>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlPending}}" hint-placeholder-val="{{false}}">
+                      <div style="width:18px;height:18px;border-radius:50%;border:2px solid oklch(88% 0.004 90);border-top-color:oklch(20% 0.01 90);box-sizing:border-box;animation:spin 0.8s linear infinite;"></div>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlDisabled}}" hint-placeholder-val="{{false}}">
+                      <div title="Leads another group" style="display:flex;opacity:0.35;">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="oklch(72% 0.005 90)" stroke-width="2" stroke-dasharray="3 3"></circle></svg>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-if value="{{sp.hasError}}" hint-placeholder-val="{{false}}">
+                <div style="padding:0 10px 6px 34px;font-size:11px;font-weight:500;color:oklch(50% 0.16 28);">{{sp.error}}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="min-width:0;">
+      <div style="font-size:16px;font-weight:700;line-height:1.25;color:oklch(20% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{activeSpeaker.track}}</div>
+      <div style="font-size:12px;line-height:1.3;color:oklch(52% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{activeSpeaker.artist}}</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:5px;">
+      <div ref="{{seekTrackRef}}" onPointerDown="{{handleSeekPointerDown}}" style="position:relative;height:4px;background:oklch(89% 0.004 90);border-radius:2px;cursor:pointer;touch-action:none;">
+        <div style="position:absolute;top:0;left:0;height:100%;border-radius:2px;background:oklch(20% 0.01 90);width:{{seekPercent}}%;"></div>
+        <div style="position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:oklch(20% 0.01 90);left:{{seekPercent}}%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #fff;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:oklch(52% 0.01 90);font-variant-numeric:tabular-nums;">
+        <span>{{positionLabel}}</span>
+        <span>{{durationLabel}}</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <button onClick="{{toggleShuffle}}" title="Shuffle" style="width:32px;height:32px;border-radius:50%;background:{{shuffleBg}};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:{{shuffleColor}};">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3.5c2 0 3 1 4.2 2.8"></path><path d="M3 18h3.5c2 0 3-1 4.2-2.8"></path><path d="M13.5 7.5C14.7 5.9 15.8 5 17.5 5H21"></path><path d="M13.5 16.5c1.2 1.6 2.3 2.5 4 2.5H21"></path><polyline points="18,2 21,5 18,8"></polyline><polyline points="18,16 21,19 18,22"></polyline></svg>
+      </button>
+      <button onClick="{{prevTrack}}" title="Previous" style="width:32px;height:32px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="2.5" height="16" rx="1"></rect><polygon points="19,4 6,12 19,20"></polygon></svg>
+      </button>
+      <button onClick="{{togglePlay}}" title="Play/Pause" style="width:40px;height:40px;border-radius:50%;background:oklch(20% 0.01 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <sc-if value="{{activeSpeaker.playing}}" hint-placeholder-val="{{true}}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+        </sc-if>
+        <sc-if value="{{notPlaying}}" hint-placeholder-val="{{false}}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="7,4 20,12 7,20"></polygon></svg>
+        </sc-if>
+      </button>
+      <button onClick="{{nextTrack}}" title="Next" style="width:32px;height:32px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,4 18,12 5,20"></polygon><rect x="17.5" y="4" width="2.5" height="16" rx="1"></rect></svg>
+      </button>
+      <div style="position:relative;">
+        <button onClick="{{toggleVolume}}" title="Volume" style="width:32px;height:32px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(30% 0.01 90);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.2 9a3.2 3.2 0 010 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"></path></svg>
+        </button>
+        <sc-if value="{{volumeOpen}}" hint-placeholder-val="{{false}}">
+          <div onClick="{{toggleVolume}}" style="position:fixed;inset:0;z-index:15;"></div>
+          <div style="position:absolute;bottom:calc(100% + 8px);right:0;background:#fff;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.16);padding:12px 12px 14px;z-index:20;width:220px;box-sizing:border-box;">
+            <div style="font-size:11px;color:oklch(52% 0.01 90);margin-bottom:8px;">Volume — {{volumeLabel}}%</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button onClick="{{volDown}}" title="Volume down 1%" style="flex-shrink:0;width:30px;height:30px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+              <div ref="{{volumeTrackRef}}" onPointerDown="{{handleVolumePointerDown}}" style="position:relative;flex:1;height:4px;background:oklch(89% 0.004 90);border-radius:2px;cursor:pointer;touch-action:none;">
+                <div style="position:absolute;top:0;left:0;height:100%;border-radius:2px;background:oklch(20% 0.01 90);width:{{volumeLabel}}%;"></div>
+                <div style="position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:oklch(20% 0.01 90);left:{{volumeLabel}}%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px #fff;"></div>
+              </div>
+              <button onClick="{{volUp}}" title="Volume up 1%" style="flex-shrink:0;width:30px;height:30px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line><line x1="12" y1="5" x2="12" y2="19"></line></svg>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+  </div>
+</div>
+<div style="font-size:12px;color:oklch(55% 0.01 90);">W · 384 × 188 · grid_options: { columns: 12, rows: 4 }</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isVertical}}" hint-placeholder-val="{{true}}">
+<div style="min-height:100vh;display:flex;justify-content:center;padding:56px 24px;box-sizing:border-box;">
+<div style="width:100%;max-width:{{cardMaxWidth}};">
+<div style="position:relative;background:oklch(99% 0.002 90);border-radius:32px;box-shadow:0 20px 60px -20px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.04);display:flex;flex-direction:{{cardDirection}};gap:24px;padding:28px;box-sizing:border-box;">
+
+  <div style="{{artBoxStyle}}">
+    <image-slot id="art-{{activeSpeaker.id}}" shape="rounded" radius="20" fit="contain" placeholder="album art"></image-slot>
+  </div>
+
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:22px;">
+
+    <div style="position:relative;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+        <button onClick="{{toggleSwitcher}}" style="display:flex;align-items:center;gap:8px;background:none;border:none;padding:0;cursor:pointer;text-align:left;">
+          <div>
+            <div style="font-size:13px;color:oklch(52% 0.01 90);letter-spacing:0.02em;">Speaker</div>
+            <div style="font-size:18px;font-weight:600;color:oklch(20% 0.01 90);display:flex;align-items:center;gap:6px;">
+              {{groupName}}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;"><polyline points="6,9 12,15 18,9"></polyline></svg>
+            </div>
+          </div>
+        </button>
+        <div style="display:flex;gap:3px;align-items:flex-end;height:22px;">
+          <div style="width:4px;height:100%;background:oklch(20% 0.01 90);border-radius:2px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0s;animation-play-state:{{eqPlayState}};"></div>
+          <div style="width:4px;height:100%;background:oklch(20% 0.01 90);border-radius:2px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.15s;animation-play-state:{{eqPlayState}};"></div>
+          <div style="width:4px;height:100%;background:oklch(20% 0.01 90);border-radius:2px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.3s;animation-play-state:{{eqPlayState}};"></div>
+          <div style="width:4px;height:100%;background:oklch(20% 0.01 90);border-radius:2px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.45s;animation-play-state:{{eqPlayState}};"></div>
+        </div>
+      </div>
+
+      <sc-if value="{{switcherOpen}}" hint-placeholder-val="{{false}}">
+        <div onClick="{{toggleSwitcher}}" style="position:fixed;inset:0;z-index:15;"></div>
+        <div style="position:absolute;top:calc(100% + 10px);left:0;right:0;background:#fff;border-radius:18px;box-shadow:0 12px 32px rgba(0,0,0,0.16);padding:8px;z-index:20;box-sizing:border-box;">
+          <sc-for list="{{speakerList}}" as="sp" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:flex;align-items:center;gap:2px;">
+                <div onClick="{{sp.select}}" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;cursor:pointer;" style-hover="background:oklch(96% 0.004 90);">
+                  <div style="width:14px;height:12px;flex-shrink:0;display:flex;align-items:flex-end;gap:2px;">
+                    <sc-if value="{{sp.playing}}" hint-placeholder-val="{{false}}">
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;"></div>
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.2s;"></div>
+                      <div style="width:3px;height:100%;background:oklch(20% 0.01 90);border-radius:1px;animation:eqBounce 0.9s ease-in-out infinite;animation-delay:0.4s;"></div>
+                    </sc-if>
+                  </div>
+                  <div style="min-width:0;flex:1;">
+                    <div style="font-size:13px;font-weight:{{sp.nameWeight}};color:oklch(20% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{sp.name}}</div>
+                    <div style="font-size:11px;color:oklch(52% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{sp.subtitle}}</div>
+                  </div>
+                </div>
+                <sc-if value="{{showGroupControls}}" hint-placeholder-val="{{true}}">
+                  <div style="width:80px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                    <sc-if value="{{sp.ctlGroupAll}}" hint-placeholder-val="{{false}}">
+                      <button onClick="{{groupAll}}" style="height:28px;padding:0 12px;border-radius:14px;background:oklch(94% 0.004 90);border:none;cursor:pointer;font-family:inherit;font-size:11px;font-weight:700;color:oklch(20% 0.01 90);opacity:{{groupAllOpacity}};white-space:nowrap;flex-shrink:0;" style-hover="background:oklch(91% 0.004 90);">{{groupAllLabel}}</button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlOn}}" hint-placeholder-val="{{false}}">
+                      <button onClick="{{sp.toggleGroup}}" title="Remove from group" style="width:44px;height:44px;border-radius:50%;background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:oklch(96% 0.004 90);">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="oklch(20% 0.01 90)"></circle><polyline points="7.5,12.5 10.5,15.5 16.5,9" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlOff}}" hint-placeholder-val="{{true}}">
+                      <button onClick="{{sp.toggleGroup}}" title="Add to group" style="width:44px;height:44px;border-radius:50%;background:none;border:none;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:oklch(96% 0.004 90);">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="oklch(72% 0.005 90)" stroke-width="2"></circle><line x1="12" y1="8" x2="12" y2="16" stroke="oklch(30% 0.01 90)" stroke-width="2" stroke-linecap="round"></line><line x1="8" y1="12" x2="16" y2="12" stroke="oklch(30% 0.01 90)" stroke-width="2" stroke-linecap="round"></line></svg>
+                      </button>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlPending}}" hint-placeholder-val="{{false}}">
+                      <div style="width:18px;height:18px;border-radius:50%;border:2px solid oklch(88% 0.004 90);border-top-color:oklch(20% 0.01 90);box-sizing:border-box;animation:spin 0.8s linear infinite;"></div>
+                    </sc-if>
+                    <sc-if value="{{sp.ctlDisabled}}" hint-placeholder-val="{{false}}">
+                      <div title="Leads another group" style="display:flex;opacity:0.35;">
+                        <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="oklch(72% 0.005 90)" stroke-width="2" stroke-dasharray="3 3"></circle></svg>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-if value="{{sp.hasError}}" hint-placeholder-val="{{false}}">
+                <div style="padding:0 10px 6px 34px;font-size:11px;font-weight:500;color:oklch(50% 0.16 28);">{{sp.error}}</div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+      <div style="min-width:0;">
+        <div style="font-size:22px;font-weight:700;color:oklch(20% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{activeSpeaker.track}}</div>
+        <div style="font-size:15px;color:oklch(52% 0.01 90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{activeSpeaker.artist}}</div>
+      </div>
+      <button onClick="{{togglePlay}}" style="flex-shrink:0;width:52px;height:52px;border-radius:50%;background:oklch(20% 0.01 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <sc-if value="{{activeSpeaker.playing}}" hint-placeholder-val="{{true}}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+        </sc-if>
+        <sc-if value="{{notPlaying}}" hint-placeholder-val="{{false}}">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><polygon points="7,4 20,12 7,20"></polygon></svg>
+        </sc-if>
+      </button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:14px;color:oklch(52% 0.01 90);width:38px;flex-shrink:0;">{{positionLabel}}</div>
+      <div ref="{{seekTrackRef}}" onPointerDown="{{handleSeekPointerDown}}" style="position:relative;flex:1;height:4px;background:oklch(89% 0.004 90);border-radius:2px;cursor:pointer;">
+        <div style="position:absolute;top:0;left:0;height:100%;border-radius:2px;background:oklch(20% 0.01 90);width:{{seekPercent}}%;"></div>
+        <div style="position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:oklch(20% 0.01 90);left:{{seekPercent}}%;transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff;"></div>
+      </div>
+      <div style="font-size:14px;color:oklch(52% 0.01 90);width:38px;flex-shrink:0;text-align:right;">{{durationLabel}}</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="position:relative;">
+        <button onClick="{{toggleVolume}}" style="width:44px;height:44px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(30% 0.01 90);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M4 9v6h4l5 4V5L8 9H4z"></path><path d="M16.2 9a3.2 3.2 0 010 6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"></path></svg>
+        </button>
+        <sc-if value="{{volumeOpen}}" hint-placeholder-val="{{false}}">
+          <div onClick="{{toggleVolume}}" style="position:fixed;inset:0;z-index:15;"></div>
+          <div style="position:absolute;bottom:calc(100% + 10px);left:0;background:#fff;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,0.16);padding:14px 14px 16px;z-index:20;width:240px;box-sizing:border-box;">
+            <div style="font-size:12px;color:oklch(52% 0.01 90);margin-bottom:8px;">Volume — {{volumeLabel}}%</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <button onClick="{{volDown}}" title="Volume down 1%" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+              <div ref="{{volumeTrackRef}}" onPointerDown="{{handleVolumePointerDown}}" style="position:relative;flex:1;height:4px;background:oklch(89% 0.004 90);border-radius:2px;cursor:pointer;touch-action:none;">
+                <div style="position:absolute;top:0;left:0;height:100%;border-radius:2px;background:oklch(20% 0.01 90);width:{{volumeLabel}}%;"></div>
+                <div style="position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:oklch(20% 0.01 90);left:{{volumeLabel}}%;transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff;"></div>
+              </div>
+              <button onClick="{{volUp}}" title="Volume up 1%" style="flex-shrink:0;width:34px;height:34px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line><line x1="12" y1="5" x2="12" y2="19"></line></svg>
+              </button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onClick="{{toggleShuffle}}" style="width:48px;height:48px;border-radius:50%;background:{{shuffleBg}};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:{{shuffleColor}};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h3.5c2 0 3 1 4.2 2.8"></path><path d="M3 18h3.5c2 0 3-1 4.2-2.8"></path><path d="M13.5 7.5C14.7 5.9 15.8 5 17.5 5H21"></path><path d="M13.5 16.5c1.2 1.6 2.3 2.5 4 2.5H21"></path><polyline points="18,2 21,5 18,8"></polyline><polyline points="18,16 21,19 18,22"></polyline></svg>
+        </button>
+        <button onClick="{{prevTrack}}" style="width:48px;height:48px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="2.5" height="16" rx="1"></rect><polygon points="19,4 6,12 19,20"></polygon></svg>
+        </button>
+        <button onClick="{{nextTrack}}" style="width:48px;height:48px;border-radius:50%;background:oklch(94% 0.004 90);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:oklch(25% 0.01 90);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,4 18,12 5,20"></polygon><rect x="17.5" y="4" width="2.5" height="16" rx="1"></rect></svg>
+        </button>
+      </div>
+    </div>
+
+    <sc-if value="{{showSpotifyCta}}" hint-placeholder-val="{{true}}">
+      <a href="https://open.spotify.com" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;background:{{ctaBg}};color:{{ctaColor}};border-radius:16px;padding:14px;font-size:15px;font-weight:600;">
+        Open Spotify
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 5h5v5"></path><path d="M19 5l-8.5 8.5"></path><path d="M18 14v5H5V6h5"></path></svg>
+      </a>
+    </sc-if>
+
+  </div>
+</div>
+</div>
+</div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 420, &quot;height&quot;: 780},
+  &quot;layout&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;vertical&quot;, &quot;options&quot;: [&quot;vertical&quot;, &quot;horizontal&quot;], &quot;tsType&quot;: &quot;'vertical'|'horizontal'&quot;, &quot;section&quot;: &quot;Layout&quot;},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#7C9A7E&quot;, &quot;options&quot;: [&quot;#7C9A7E&quot;, &quot;#6E93C9&quot;, &quot;#C9A15A&quot;, &quot;#C77E7E&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Style&quot;},
+  &quot;showSpotifyCta&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Features&quot;},
+  &quot;switcherGrouping&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Grouping&quot;},
+  &quot;disableMainSpeakers&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Grouping&quot;},
+  &quot;simulateGroupErrors&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;never&quot;, &quot;options&quot;: [&quot;never&quot;, &quot;sometimes&quot;, &quot;always&quot;], &quot;tsType&quot;: &quot;'never'|'sometimes'|'always'&quot;, &quot;section&quot;: &quot;Grouping&quot;}
+}">
+class Component extends DCLogic {
+  state = {
+    activeSpeakerId: 'living',
+    switcherOpen: false,
+    volumeOpen: false,
+    leader: { living: 'living', kitchen: 'living', bedroom: 'bedroom', office: 'bedroom' },
+    pending: {},
+    errors: {},
+    order: null,
+    speakers: [
+      { id: 'living', name: 'Living Room', playing: true, volume: 62, position: 62, currentIndex: 0,
+        queue: [
+          { track: 'Morning Mix', artist: 'Navet Radio', duration: 243 },
+          { track: 'Sunlit Groove', artist: 'Navet Radio', duration: 198 },
+          { track: 'Wake & Bake', artist: 'Aiden Cole', duration: 212 }
+        ] },
+      { id: 'kitchen', name: 'Kitchen', playing: false, volume: 40, position: 54, currentIndex: 0,
+        queue: [
+          { track: 'Sunday Jazz', artist: 'Blue Note Radio', duration: 198 },
+          { track: 'Rainy Piano', artist: 'Blue Note Radio', duration: 225 },
+          { track: 'Brass & Soul', artist: 'Miles Ahead FM', duration: 180 }
+        ] },
+      { id: 'bedroom', name: 'Bedroom', playing: true, volume: 25, position: 120, currentIndex: 0,
+        queue: [
+          { track: 'Deep Focus', artist: 'Echo Chill', duration: 301 },
+          { track: 'Night Drift', artist: 'Echo Chill', duration: 264 },
+          { track: 'Slow Waves', artist: 'Aiden Cole', duration: 230 }
+        ] },
+      { id: 'office', name: 'Office', playing: false, volume: 55, position: 10, currentIndex: 0,
+        queue: [
+          { track: 'Coding Beats', artist: 'Lo-Fi Labs', duration: 222 },
+          { track: 'Keyboard Clicks', artist: 'Lo-Fi Labs', duration: 210 },
+          { track: 'Focus Flow', artist: 'Navet Radio', duration: 240 }
+        ] }
+    ].map(sp => ({ ...sp, track: sp.queue[0].track, artist: sp.queue[0].artist, duration: sp.queue[0].duration }))
+  };
+
+  seekTrackRef = React.createRef();
+  volumeTrackRef = React.createRef();
+
+  componentDidMount() {
+    this._timer = setInterval(() => {
+      this.setState(s => ({
+        speakers: s.speakers.map(sp => {
+          if (!sp.playing) return sp;
+          if (sp.position >= sp.duration) return { ...sp, playing: false };
+          return { ...sp, position: sp.position + 1 };
+        })
+      }));
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._timer);
+    this._opTimers.forEach(clearTimeout);
+    this.detachSeekListeners();
+    this.detachVolumeListeners();
+  }
+
+  formatTime(sec) {
+    const s = Math.max(0, Math.round(sec));
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m + ':' + String(r).padStart(2, '0');
+  }
+
+  getActiveSpeaker() {
+    return this.state.speakers.find(sp => sp.id === this.state.activeSpeakerId);
+  }
+
+  updateActiveSpeaker(patch) {
+    this.setState(s => ({
+      speakers: s.speakers.map(sp => sp.id === s.activeSpeakerId ? { ...sp, ...patch } : sp)
+    }));
+  }
+
+  _opTimers = [];
+
+  // Sorted once per open (active → its group → rest), frozen while open so rows never move under a finger.
+  computeOrder(s) {
+    const a = s.activeSpeakerId;
+    const ids = s.speakers.map(sp => sp.id);
+    const members = ids.filter(id => id !== a && s.leader[id] === a);
+    const rest = ids.filter(id => id !== a && s.leader[id] !== a);
+    return [a, ...members, ...rest];
+  }
+
+  toggleSwitcher = () => this.setState(s => s.switcherOpen
+    ? { switcherOpen: false }
+    : { switcherOpen: true, volumeOpen: false, order: this.computeOrder(s) });
+  toggleVolume = () => this.setState(s => ({ volumeOpen: !s.volumeOpen }));
+
+  selectSpeaker(id) {
+    this.setState(s => ({ activeSpeakerId: s.leader[id], switcherOpen: false }));
+  }
+
+  groupMembers(leaderId, leader = this.state.leader) {
+    const ids = this.state.speakers.map(sp => sp.id).filter(id => leader[id] === leaderId);
+    return [leaderId, ...ids.filter(id => id !== leaderId)];
+  }
+
+  groupName(leaderId) {
+    const names = this.groupMembers(leaderId).map(id => this.state.speakers.find(sp => sp.id === id).name);
+    if (names.length === 1) return names[0];
+    if (names.length === 2) return names[0] + ' + ' + names[1];
+    return names[0] + ' + ' + (names.length - 1);
+  }
+
+  toggleGroup(id) {
+    const s = this.state;
+    if (s.pending[id]) return;
+    this.runGroupOp([id], s.leader[id] !== s.activeSpeakerId, s.activeSpeakerId);
+  }
+
+  ungroupAll = () => {
+    const s = this.state;
+    const a = s.activeSpeakerId;
+    const ids = this.groupMembers(a).filter(id => id !== a && !s.pending[id]);
+    if (ids.length) this.runGroupOp(ids, false, a);
+  };
+
+  groupableIds() {
+    const s = this.state;
+    const a = s.activeSpeakerId;
+    const disableMain = this.props.disableMainSpeakers ?? false;
+    return s.speakers.map(sp => sp.id).filter(id => {
+      if (id === a || s.leader[id] === a || s.pending[id]) return false;
+      const leadsOther = s.leader[id] === id && this.groupMembers(id).length > 1;
+      return !(disableMain && leadsOther);
+    });
+  }
+
+  groupAll = () => {
+    const ids = this.groupableIds();
+    if (ids.length) this.runGroupOp(ids, true, this.state.activeSpeakerId);
+  };
+
+  runGroupOp(ids, join, targetLeader) {
+    this.setState(s => {
+      const pending = { ...s.pending }, errors = { ...s.errors };
+      ids.forEach(id => { pending[id] = true; delete errors[id]; });
+      return { pending, errors };
+    });
+    ids.forEach(id => {
+      this._opTimers.push(setTimeout(() => this.finishGroupOp(id, join, targetLeader), 900 + Math.random() * 1600));
+    });
+  }
+
+  finishGroupOp(id, join, targetLeader) {
+    const mode = this.props.simulateGroupErrors ?? 'never';
+    const fail = mode === 'always' || (mode === 'sometimes' && Math.random() < 0.4);
+    this.setState(s => {
+      const pending = { ...s.pending };
+      delete pending[id];
+      if (fail) {
+        this._opTimers.push(setTimeout(() => this.setState(s2 => {
+          const errors = { ...s2.errors }; delete errors[id]; return { errors };
+        }), 4000));
+        return { pending, errors: { ...s.errors, [id]: join ? "Couldn't group — try again" : "Couldn't ungroup — try again" } };
+      }
+      const leader = { ...s.leader };
+      let speakers = s.speakers;
+      if (join) {
+        // Joining a leader pulls only that speaker; its old group stays together under a new leader.
+        const others = Object.keys(leader).filter(k => k !== id && leader[k] === id);
+        if (others.length) {
+          const nl = others[0];
+          const src = speakers.find(sp => sp.id === id);
+          others.forEach(k => { leader[k] = nl; });
+          speakers = speakers.map(sp => sp.id === nl
+            ? { ...sp, playing: src.playing, track: src.track, artist: src.artist, duration: src.duration, position: src.position, queue: src.queue, currentIndex: src.currentIndex }
+            : sp);
+        }
+        leader[id] = targetLeader;
+      } else {
+        leader[id] = id;
+      }
+      speakers = speakers.map(sp => sp.id === id ? { ...sp, playing: false } : sp);
+      return { pending, leader, speakers };
+    });
+  }
+
+  togglePlay = () => this.updateActiveSpeaker({ playing: !this.getActiveSpeaker().playing });
+
+  toggleShuffle = () => this.updateActiveSpeaker({ shuffle: !this.getActiveSpeaker().shuffle });
+
+  pickIndex(sp, dir) {
+    if (sp.shuffle && sp.queue.length > 1) {
+      let idx;
+      do { idx = Math.floor(Math.random() * sp.queue.length); } while (idx === sp.currentIndex);
+      return idx;
+    }
+    return (sp.currentIndex + dir + sp.queue.length) % sp.queue.length;
+  }
+
+  prevTrack = () => {
+    const sp = this.getActiveSpeaker();
+    const idx = this.pickIndex(sp, -1);
+    const q = sp.queue[idx];
+    this.updateActiveSpeaker({ currentIndex: idx, track: q.track, artist: q.artist, duration: q.duration, position: 0 });
+  };
+
+  nextTrack = () => {
+    const sp = this.getActiveSpeaker();
+    const idx = this.pickIndex(sp, 1);
+    const q = sp.queue[idx];
+    this.updateActiveSpeaker({ currentIndex: idx, track: q.track, artist: q.artist, duration: q.duration, position: 0 });
+  };
+
+  updateSeekFromEvent(e) {
+    if (!this.seekTrackRef.current) return;
+    const rect = this.seekTrackRef.current.getBoundingClientRect();
+    let ratio = (e.clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+    const sp = this.getActiveSpeaker();
+    this.updateActiveSpeaker({ position: Math.round(ratio * sp.duration) });
+  }
+
+  updateVolumeFromEvent(e) {
+    if (!this.volumeTrackRef.current) return;
+    const rect = this.volumeTrackRef.current.getBoundingClientRect();
+    let ratio = (e.clientX - rect.left) / rect.width;
+    ratio = Math.max(0, Math.min(1, ratio));
+    this.updateActiveSpeaker({ volume: Math.round(ratio * 100) });
+  }
+
+  handleSeekPointerDown = (e) => {
+    this.updateSeekFromEvent(e);
+    this._onSeekMove = (ev) => this.updateSeekFromEvent(ev);
+    this._onSeekUp = () => this.detachSeekListeners();
+    window.addEventListener('pointermove', this._onSeekMove);
+    window.addEventListener('pointerup', this._onSeekUp);
+  };
+
+  detachSeekListeners() {
+    if (this._onSeekMove) window.removeEventListener('pointermove', this._onSeekMove);
+    if (this._onSeekUp) window.removeEventListener('pointerup', this._onSeekUp);
+  }
+
+  handleVolumePointerDown = (e) => {
+    this.updateVolumeFromEvent(e);
+    this._onVolMove = (ev) => this.updateVolumeFromEvent(ev);
+    this._onVolUp = () => this.detachVolumeListeners();
+    window.addEventListener('pointermove', this._onVolMove);
+    window.addEventListener('pointerup', this._onVolUp);
+  };
+
+  detachVolumeListeners() {
+    if (this._onVolMove) window.removeEventListener('pointermove', this._onVolMove);
+    if (this._onVolUp) window.removeEventListener('pointerup', this._onVolUp);
+  }
+
+  softBg(hex) {
+    return 'color-mix(in oklch, ' + hex + ' 18%, white)';
+  }
+
+  renderVals() {
+    const active = this.getActiveSpeaker();
+    const accent = this.props.accentColor ?? '#7C9A7E';
+    const horizontal = (this.props.layout ?? 'vertical') === 'horizontal';
+
+    const s = this.state;
+    const grouping = this.props.switcherGrouping ?? true;
+    const disableMain = this.props.disableMainSpeakers ?? false;
+    const byId = id => s.speakers.find(sp => sp.id === id);
+    const order = s.order || this.computeOrder(s);
+    const activeGroup = this.groupMembers(active.id);
+
+    const speakerList = order.map(id => {
+      const sp = byId(id);
+      const lead = byId(s.leader[id]);
+      const isActive = id === active.id;
+      const inActive = !isActive && s.leader[id] === active.id;
+      const groupSize = this.groupMembers(s.leader[id]).length;
+      const leadsOther = !isActive && s.leader[id] === id && groupSize > 1;
+      const disabled = disableMain && leadsOther;
+      const pending = !!s.pending[id];
+      let subtitle;
+      if (isActive) subtitle = (sp.playing ? 'Playing — ' : 'Paused — ') + sp.track;
+      else if (inActive) subtitle = 'In this group';
+      else if (s.leader[id] !== id) subtitle = 'With ' + lead.name + (lead.playing ? ' · Playing — ' + lead.track : '');
+      else if (leadsOther) subtitle = (sp.playing ? 'Playing — ' + sp.track : sp.track) + ' · Group of ' + groupSize;
+      else subtitle = sp.playing ? 'Playing — ' + sp.track : 'Idle';
+      return {
+        id,
+        name: isActive ? this.groupName(id) : sp.name,
+        subtitle,
+        playing: lead.playing,
+        nameWeight: isActive ? 700 : 500,
+        ctlGroupAll: isActive,
+        ctlLeader: isActive && activeGroup.length > 1,
+        ctlOn: !isActive && !pending && !disabled && inActive,
+        ctlOff: !isActive && !pending && !disabled && !inActive,
+        ctlPending: pending,
+        ctlDisabled: !pending && disabled,
+        hasError: !!s.errors[id],
+        error: s.errors[id] || '',
+        select: () => this.selectSpeaker(id),
+        toggleGroup: () => this.toggleGroup(id)
+      };
+    });
+    const ungroupPending = activeGroup.slice(1).some(id => s.pending[id]);
+
+    return {
+      activeSpeaker: active,
+      notPlaying: !active.playing,
+      positionLabel: this.formatTime(active.position),
+      durationLabel: this.formatTime(active.duration),
+      seekPercent: active.duration ? Math.min(100, (active.position / active.duration) * 100) : 0,
+      volumeLabel: active.volume,
+      eqPlayState: active.playing ? 'running' : 'paused',
+      switcherOpen: this.state.switcherOpen,
+      volumeOpen: this.state.volumeOpen,
+      speakerList,
+      groupName: this.groupName(active.id),
+      showGroupControls: grouping,
+      showUngroupAll: grouping && activeGroup.length > 1,
+      ungroupAll: this.ungroupAll,
+      groupAll: activeGroup.length > 1 ? this.ungroupAll : this.groupAll,
+      groupAllLabel: s.speakers.some(sp => s.pending[sp.id] && s.leader[sp.id] !== active.id) ? 'Grouping…'
+        : ungroupPending ? 'Ungrouping…'
+        : activeGroup.length > 1 ? 'Ungroup all' : 'Group all',
+      groupAllOpacity: (activeGroup.length > 1 ? !ungroupPending : this.groupableIds().length > 0) ? 1 : 0.4,
+      ungroupLabel: ungroupPending ? 'Ungrouping…' : 'Ungroup all',
+      ungroupOpacity: ungroupPending ? 0.45 : 1,
+      showSpotifyCta: this.props.showSpotifyCta ?? true,
+      ctaBg: this.softBg('#1DB954'),
+      ctaColor: '#1DB954',
+      isHorizontal: horizontal,
+      isVertical: !horizontal,
+      cardDirection: horizontal ? 'row' : 'column',
+      cardMaxWidth: horizontal ? '860px' : '380px',
+      artBoxStyle: horizontal
+        ? 'width:260px;min-width:260px;aspect-ratio:1/1;align-self:center;border-radius:18px;overflow:hidden;background:oklch(93% 0.005 90);'
+        : 'width:55%;margin:0 auto;aspect-ratio:1/1;border-radius:18px;overflow:hidden;background:oklch(93% 0.005 90);',
+      toggleSwitcher: this.toggleSwitcher,
+      toggleVolume: this.toggleVolume,
+      togglePlay: this.togglePlay,
+      prevTrack: this.prevTrack,
+      nextTrack: this.nextTrack,
+      handleSeekPointerDown: this.handleSeekPointerDown,
+      handleVolumePointerDown: this.handleVolumePointerDown,
+      seekTrackRef: this.seekTrackRef,
+      volumeTrackRef: this.volumeTrackRef,
+      toggleShuffle: this.toggleShuffle,
+      volUp: () => this.updateActiveSpeaker({ volume: Math.min(100, active.volume + 1) }),
+      volDown: () => this.updateActiveSpeaker({ volume: Math.max(0, active.volume - 1) }),
+      shuffleBg: active.shuffle ? this.softBg(accent) : 'oklch(94% 0.004 90)',
+      shuffleColor: active.shuffle ? accent : 'oklch(25% 0.01 90)'
+    };
+  }
+}
+</script>
+</body>
+</html>

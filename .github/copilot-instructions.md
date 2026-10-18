@@ -56,6 +56,12 @@
 - Do not create or keep Base\* classes for a single consumer. Base classes are only allowed when there are 2+ concrete classes sharing real behavior.
 - Do not re-export section-local types from `src/types.ts`. Keep section-local types imported from their own `<section>.types.ts` file.
 
+# Card & Section Sizing (resizable dashboards)
+
+General guidance for making a card fill and resize correctly in Home Assistant's Sections dashboard view lives in `Home Assistant Card Instructions.md`, one level up from this repo (`../Home Assistant Card Instructions.md` — shared across all card projects in this folder, not sonos-card specific). Read it before touching `getLayoutOptions()`, `getCardSize()`, `haCardStyle()`/`contentStyle()`, or any section's height/width CSS chain.
+
+Sonos-card-specific notes: the pattern is implemented in `src/card.ts` (`getLayoutOptions()`, `haCardStyle()`, `contentStyle()`) and `src/sections/player/player-section.styles.ts`, gated behind the Player-only case (`this.section === PLAYER && !showFooter`) — other sections don't currently use this pattern.
+
 # Editor Schema
 
 - Config options in the advanced editor are organized by section (Common, Player, Favorites, Groups, Grouping, Volumes, Queue).
